@@ -5,6 +5,8 @@ Length Tag Value parsing is a simple and effective way to send binary data over-
 Progress:
 - [x] project created. Aug 12th.
 - [x] sample binary TLV file created. Aug 12th.
+- [x] inline binary TLV data created. Aug 12th.
+- [x] sketched out tag reading, incl. nesting. Aug 12th.
 
 3 step Plan:
 - create a function that takes a binary stream and finds the first tag
@@ -18,12 +20,18 @@ Requirements:
 Assumptions:
 - the tag is a consistent length of 1 byte.
 - Bytes are little endian. Why assume this? Because Apple Silicon is little endian.
-- We will be working with an EMV-TLV. This is payments related and as such the closet thing I could imagine being relelvant to TLV within Apple Pay that I could find on the internet. 
+- We will be working with an EMV-TLV. This is payments related and as such the closet thing I could imagine being relelvant to TLV within Apple Pay that I could find on the internet.
+- tags can ONLY appear on the template they are assigned, if they are assigned one. Otherwise they can only appear on the top level (?)
 
 ## Sample EMV-TLV string
 6F1A840E315041592E5359532E4444463031A5088801025F2D02656E
 6F 1A 84 0E 31 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 08 88 01 02 5F 2D 02 65 6E
 decoded: https://emvlab.org/tlvutils/?data=6F1A840E315041592E5359532E4444463031A5088801025F2D02656E
+
+First Tag: 6F
+
+## Tags:
+Based on the EMV standard(?), tags can be either primitives or constructed. Constructed tags have nested tags within, and, it appears, no simple data on them. 
 
 ## Additional Information:
 - A fantastic explainer on EMV-TLV https://skryvets.com/blog/2020/05/02/what-are-emv-tags/
