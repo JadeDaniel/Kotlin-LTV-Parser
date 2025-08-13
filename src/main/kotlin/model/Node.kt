@@ -1,17 +1,34 @@
 package co.couldbe.demo.model
 
-import co.couldbe.demo.prettyHex
+import co.couldbe.demo.prettyTagNameHex
 import co.couldbe.demo.tags.TagDefinition
 
+@OptIn(ExperimentalUnsignedTypes::class)
 sealed class Node {
+    abstract val tag: TagDefinition
     abstract override fun toString(): String
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    data class Primitive(val tag: TagDefinition, val value: ByteArray) : Node() {
-        override fun toString(): String = "Primitive(tag=$tag, value=${value.toUByteArray().prettyHex()})"
+    data class Primitive(override val tag: TagDefinition, val value: ByteArray) : Node() {
+        override fun toString(): String {
+            val attributeString = listOfNotNull(
+                "tag=${tag.tag.prettyTagNameHex()}",
+                "value=${value.toUByteArray().prettyTagNameHex()}",
+                tag.template?.let { "template=${tag.template.tag.prettyTagNameHex()}" }
+            ).joinToString()
+
+            return "Primitive($attributeString)"
+        }
     }
 
-    data class Constructed(val tag: TagDefinition, val children: List<Node>) : Node() {
-        override fun toString(): String = "Constructed(tag=$tag, children=$children)"
+    data class Constructed(override val tag: TagDefinition, val children: List<Node>) : Node() {
+        override fun toString(): String {
+            val attributeString = listOfNotNull(
+                "tag=${tag.tag.prettyTagNameHex()}",
+                tag.template?.let { "template=${tag.template.tag.prettyTagNameHex()}" },
+                "children=${children}",
+            ).joinToString()
+
+            return "Constructed($attributeString)"
+        }
     }
 }

@@ -1,6 +1,6 @@
 package co.couldbe.demo.tags
 
-import co.couldbe.demo.prettyHex
+import co.couldbe.demo.prettyTagNameHex
 
 data class TagDefinition @OptIn(ExperimentalUnsignedTypes::class) constructor(
     val tag: UByteArray,
@@ -23,6 +23,12 @@ data class TagDefinition @OptIn(ExperimentalUnsignedTypes::class) constructor(
 
     @OptIn(ExperimentalUnsignedTypes::class)
     override fun toString(): String {
-        return "Tag(type=${if (isConstructed) "Constructed" else "Primitive"}, tag=${tag.prettyHex()}, template=$template)"
+        val attributeString = listOfNotNull(
+            "tag=${tag.prettyTagNameHex()}",
+            "type=${if (isConstructed) "Constructed" else "Primitive"}",
+            template?.let { "template=${template.tag.prettyTagNameHex()}" },
+        ).joinToString()
+
+        return "Tag($attributeString)"
     }
 }

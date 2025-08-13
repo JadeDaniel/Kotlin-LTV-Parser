@@ -1,20 +1,32 @@
 package co.couldbe.demo
 
 import co.couldbe.demo.model.Node
-import co.couldbe.demo.tags.EMVTags
+import co.couldbe.demo.tags.TagDefinitions
 import co.couldbe.demo.tags.Tag
 import co.couldbe.demo.tags.TagDefinition
 import java.io.ByteArrayInputStream
 import java.util.Base64
 
-// Press <shortcut actionId="Debug"/> to start debugging your code.
-// Press <shortcut actionId="Run"/> to run your code.
+/*
+    TODO consider a CLI interface and even JSON output
+ */
 
 fun main() {
-    val byteStream = getSampleTlv()
+    val bytes = getSampleTlv()
+    val nodes = parseTags(ByteArrayInputStream(bytes)).map { tag -> buildNode(tag) }.toList()
+    prettyPrintNodes(nodes)
+}
 
-    val nodes = parseTags(ByteArrayInputStream(byteStream)).map { tag -> buildNode(tag) }.toList()
-    println(nodes)
+@OptIn(ExperimentalUnsignedTypes::class)
+fun prettyPrintNodes(nodes: List<Node>, level: Int = 0) {
+    nodes.forEach { node ->
+        val indent = "  ".repeat(level)
+        val nodeValue = if (node is Node.Primitive) { " value [${node.value.toUByteArray().prettyHex()}]" } else ""
+        println("$indent${node.tag.tag.prettyTagNameHex()} $nodeValue")
+        if (node is Node.Constructed) {
+            prettyPrintNodes(node.children, level + 1)
+        }
+    }
 }
 
 fun parseTags(stream: ByteArrayInputStream): Sequence<Tag> =
@@ -28,29 +40,37 @@ fun parseTags(stream: ByteArrayInputStream): Sequence<Tag> =
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun parseTag(stream: ByteArrayInputStream): Tag {
-    // TODO handle case where stream is exhausted
-    // TODO validate that found tag has the appropriate template for the last item on the tag stack, if in a constructed tag
     var tagBytes = UByteArray(0)
     var tagDef: TagDefinition? = null
 
-    while(tagBytes.size < EMVTags.MAX_TAG_LENGTH) { // only look for definitions up to N bytes long
+    while(tagBytes.size < TagDefinitions.MAX_TAG_LENGTH) { // only look for definitions up to N bytes long
         tagBytes += stream.read().toUByte() // read next byte and add to buffer
-        tagDef = EMVTags.fromBytes(tagBytes) // attempt to find a matching tag definition
+        tagDef = TagDefinitions.fromBytes(tagBytes) // attempt to find a matching tag definition
         if (tagDef != null) break // if found, stop looking
     }
     if (tagDef == null) { // no tag found
-        throw IllegalArgumentException("Unknown tag ${tagBytes.prettyHex()}")
+        throw IllegalArgumentException("Unknown tag ${tagBytes.prettyTagNameHex()}")
     }
 
+    if (stream.available() < 1) throw IllegalArgumentException("Unexpected end of stream, no length value found following tag ${tagDef.tag.prettyTagNameHex()}")
     val length = stream.read()
 
     val value = ByteArray(length)
+    if (stream.available() < length) throw IllegalArgumentException("Unexpected end of stream, expected ${length - stream.available()} more byte(s)")
     stream.read(value)
 
     return Tag(tagDef, length, value)
 }
 
+@OptIn(ExperimentalUnsignedTypes::class)
 fun buildNode(tag: Tag, parentTag: Tag? = null): Node {
+    if (tag.template() != null && !tag.template()?.tag.contentEquals(parentTag?.tag())) {
+        if (parentTag == null) {
+            throw IllegalArgumentException("Tag ${tag.definition.tag.prettyTagNameHex()} expected to be nested under ${tag.template()?.tag?.prettyTagNameHex()}, but was at the root level")
+        }
+        throw IllegalArgumentException("Tag ${tag.definition.tag.prettyTagNameHex()} expected to be nested under ${tag.template()?.tag?.prettyTagNameHex()}, but was nested under ${parentTag?.tag()?.prettyTagNameHex()}")
+    }
+
     if (tag.isConstructed()) {
         val childrenNodes = parseTags(ByteArrayInputStream(tag.value)).map { childTag ->
             buildNode(childTag, tag)
@@ -65,5 +85,23 @@ fun getSampleTlv(): ByteArray {
     return Base64.getDecoder().decode("bxqEDjFQQVkuU1lTLkRERjAxpQiIAQJfLQJlbg==")
 }
 
+//@OptIn(ExperimentalUnsignedTypes::class)
+//fun UByteArray.prettyHex(): String = this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
+
 @OptIn(ExperimentalUnsignedTypes::class)
-fun UByteArray.prettyHex(): String = this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
+fun UByteArray.prettyTagNameHex(): String {
+    val hex =  this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
+    val tagName = TagDefinitions.entryName(this)
+    if (tagName == null) {
+        return hex
+    } else {
+        return "$tagName ($hex)"
+    }
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+fun UByteArray.prettyHex(): String {
+    val hex =  this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
+    val tagName = TagDefinitions.entryName(this)
+    return "${if (tagName != null) "$tagName " else ""}$hex"
+}

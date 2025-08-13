@@ -24,6 +24,17 @@ Assumptions:
 - tags can ONLY appear on the template they are assigned, if they are assigned one. Otherwise they can only appear on the top level (?)
 - length definition itself is never longer than a byte
 
+# SETUP
+- IntelliJ IDEA 2025.2 (Ultimate Edition)
+- Kotlin plugin 2.2.0
+- Gradle 8.14
+- Java 24 (OpenJDK)
+
+# Usage
+
+## Running the Application
+
+To run the application from the command line:
 
 ## AI
 - I was getting an unknown tag error for a byte that wasn't in the stream. AI explained that 0xA5 was being printed as -5B because it was a signed byte. I then switched all my Bytes to Unsigned Bytes and the error message printed correctly.
@@ -33,7 +44,6 @@ Assumptions:
 6F 1A 84 0E 31 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 08 88 01 02 5F 2D 02 65 6E
 decoded: https://emvlab.org/tlvutils/?data=6F1A840E315041592E5359532E4444463031A5088801025F2D02656E
 
-First Tag: 6F
 
 ## tags:
 Based on the EMV standard(?), tags can be either primitives or constructed. Constructed tags have nested tags within, and, it appears, no simple data on them. 
@@ -46,7 +56,14 @@ https://en.wikipedia.org/wiki/Type–length–value
 - https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/
 - using BinEd plugin in IntelliJ to edit and view sample TLV
 
+## real world changes
+if this was the real world, it would be nice to have an extensive test Domain Specific Language (DSL) to allow definnig complex nested data easily.
+
 ## Working Questions
 - Are length values in the binary format encoded in binary or hex?
 - Does apple pay use TLV? If so, big endian or little endian data?
 - Should I use a file, or simply create a function that takes a binary stream? Maybe the latter.
+
+## Assumptions
+- constructed tags are allowed to be empty
+- regular tags are allowed to be empty
