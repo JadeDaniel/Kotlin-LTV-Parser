@@ -1,8 +1,9 @@
 package co.couldbe.demo.tags
 
-
 @OptIn(ExperimentalUnsignedTypes::class)
-enum class TagDefinitions(val definition: TagDefinition) {
+enum class TagDefinitions(
+    val definition: TagDefinition,
+) {
     FCITemplate(TagDefinition(0x6F, isConstructed = true)),
     DF(TagDefinition(0x84, FCITemplate.definition)),
     FCIProprietaryTemplate(TagDefinition(0xA5, FCITemplate.definition, true)),
@@ -14,10 +15,8 @@ enum class TagDefinitions(val definition: TagDefinition) {
         const val MAX_TAG_LENGTH = 2
 
         @OptIn(ExperimentalUnsignedTypes::class)
-        fun fromBytes(tag: UByteArray): TagDefinition? =
-            entries.find { it.definition.tag.contentEquals(tag) }?.definition
+        fun fromBytes(tag: UByteArray): TagDefinition? = entries.find { it.definition.tag.contentEquals(tag) }?.definition
 
-        fun entryName(tag: UByteArray): String? =
-            entries.find { it.definition.tag.contentEquals(tag) }?.name
+        fun entryName(tag: UByteArray): String? = entries.find { it.definition.tag.contentEquals(tag) }?.name
     }
 }

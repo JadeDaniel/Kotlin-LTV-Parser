@@ -4,9 +4,11 @@ package co.couldbe.demo.tags
 data class Tag(
     val definition: TagDefinition,
     val length: Int,
-    val value: ByteArray
+    val value: ByteArray,
 ) {
     fun isConstructed() = definition.isConstructed
+
     fun template() = definition.template
+
     fun tag() = definition.tag
 }
