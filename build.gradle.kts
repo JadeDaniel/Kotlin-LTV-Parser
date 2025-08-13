@@ -1,4 +1,6 @@
+
 plugins {
+    application
     kotlin("jvm") version "2.2.0"
 }
 
@@ -18,4 +20,8 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(24)
+}
+
+application {
+    mainClass.set("co.couldbe.demo.MainKt")
 }
