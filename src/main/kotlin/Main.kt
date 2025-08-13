@@ -68,7 +68,7 @@ fun buildNode(tag: Tag, parentTag: Tag? = null): Node {
         if (parentTag == null) {
             throw IllegalArgumentException("Tag ${tag.definition.tag.prettyTagNameHex()} expected to be nested under ${tag.template()?.tag?.prettyTagNameHex()}, but was at the root level")
         }
-        throw IllegalArgumentException("Tag ${tag.definition.tag.prettyTagNameHex()} expected to be nested under ${tag.template()?.tag?.prettyTagNameHex()}, but was nested under ${parentTag?.tag()?.prettyTagNameHex()}")
+        throw IllegalArgumentException("Tag ${tag.definition.tag.prettyTagNameHex()} expected to be nested under ${tag.template()?.tag?.prettyTagNameHex()}, but was nested under ${parentTag.tag()?.prettyTagNameHex()}")
     }
 
     if (tag.isConstructed()) {
