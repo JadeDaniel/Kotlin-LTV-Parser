@@ -18,10 +18,11 @@ Requirements:
 - nesting *is* supported/expected
 
 Assumptions:
-- the tag is a consistent length of 1 byte.
+- the tag is a consistent length of 1 byte. IRL they can be longer!
 - Bytes are little endian. Why assume this? Because Apple Silicon is little endian.
 - We will be working with an EMV-TLV. This is payments related and as such the closet thing I could imagine being relelvant to TLV within Apple Pay that I could find on the internet.
 - tags can ONLY appear on the template they are assigned, if they are assigned one. Otherwise they can only appear on the top level (?)
+- length definition itself is never longer than a byte
 
 ## Sample EMV-TLV string
 6F1A840E315041592E5359532E4444463031A5088801025F2D02656E
