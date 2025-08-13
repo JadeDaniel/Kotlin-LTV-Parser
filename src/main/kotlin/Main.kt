@@ -85,9 +85,6 @@ fun getSampleTlv(): ByteArray {
     return Base64.getDecoder().decode("bxqEDjFQQVkuU1lTLkRERjAxpQiIAQJfLQJlbg==")
 }
 
-//@OptIn(ExperimentalUnsignedTypes::class)
-//fun UByteArray.prettyHex(): String = this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
-
 @OptIn(ExperimentalUnsignedTypes::class)
 fun UByteArray.prettyTagNameHex(): String {
     val hex =  this.joinToString(" ") { it.toString(16).uppercase().padStart(2, '0') }
