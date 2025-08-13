@@ -43,6 +43,7 @@ FCITemplate (6F)
 - EMV-TLV tags can be either primitives or constructed. 
   - Constructed tags have nested tags and no simple data on them.
   - Primitive tags contain a byte array value and no nested tags.
+- Tags cannot share the same first byte (i.e. one multi byte and one single byte tag)
 
 ## Sample EMV-TLV data
 This data is used in the main function to generate the sample output.
