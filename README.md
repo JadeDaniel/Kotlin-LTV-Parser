@@ -24,6 +24,10 @@ Assumptions:
 - tags can ONLY appear on the template they are assigned, if they are assigned one. Otherwise they can only appear on the top level (?)
 - length definition itself is never longer than a byte
 
+
+## AI
+- I was getting an unknown tag error for a byte that wasn't in the stream. AI explained that 0xA5 was being printed as -5B because it was a signed byte. I then switched all my Bytes to Unsigned Bytes and the error message printed correctly.
+- 
 ## Sample EMV-TLV string
 6F1A840E315041592E5359532E4444463031A5088801025F2D02656E
 6F 1A 84 0E 31 50 41 59 2E 53 59 53 2E 44 44 46 30 31 A5 08 88 01 02 5F 2D 02 65 6E
@@ -31,7 +35,7 @@ decoded: https://emvlab.org/tlvutils/?data=6F1A840E315041592E5359532E4444463031A
 
 First Tag: 6F
 
-## Tags:
+## tags:
 Based on the EMV standard(?), tags can be either primitives or constructed. Constructed tags have nested tags within, and, it appears, no simple data on them. 
 
 ## Additional Information:
